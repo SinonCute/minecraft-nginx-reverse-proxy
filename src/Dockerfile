@@ -4,10 +4,13 @@ LABEL maintainer="vollborn <oliver.vollborn@gmail.com>"
 LABEL version="1.3.0"
 LABEL description="a simple nginx reverse proxy for minecraft servers"
 
-ENV TZ="Europe/Berlin"
+ENV TZ="Asia/Ho_Chi_Minh"
 
-ENV INITIAL_HOST=""
-ENV INITIAL_PORT=""
+ENV BEDROCK_HOST=""
+ENV BEDROCK_PORT=""
+
+ENV JAVA_HOST=""
+ENV JAVA_PORT=""
 
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install -y wget libpcre3-dev build-essential libssl-dev zlib1g-dev && \
@@ -30,7 +33,8 @@ RUN mkdir /opt/nginx/http.conf.d && mkdir /opt/nginx/stream.conf.d
 
 ADD startup.sh /opt/startup.sh
 ADD set_host.sh /opt/set_host.sh
-ADD minecraft.template.conf /opt/minecraft.template.conf
+ADD minecraft-bedrock.template.conf /opt/nginx/stream.conf.d/minecraft-bedrock.template.conf
+ADD minecraft-java.template.conf /opt/nginx/stream.conf.d/minecraft-java.template.conf
 ADD nginx.conf /opt/nginx/conf/nginx.conf
 
 RUN chmod +x /opt/startup.sh
@@ -41,5 +45,6 @@ RUN ln -s /dev/stdout /var/log/nginx/access.log
 RUN ln -s /dev/stderr /var/log/nginx/error.log
 
 EXPOSE 25565
+EXPOSE 19132/udp
 
 CMD ["/opt/startup.sh"]

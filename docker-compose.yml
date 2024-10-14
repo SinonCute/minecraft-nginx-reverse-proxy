@@ -1,11 +1,22 @@
-version: "3.8"
-
 services:
   proxy:
     image: minecraft-nginx-reverse-proxy
     build: ./src
     restart: unless-stopped
+
+    # Expose both Bedrock and Java ports
     ports:
-      - "${LOCAL_PORT:-25565}:25565"
+      - "${LOCAL_PORT_JAVA:-25565}:25565"   # Java Edition
+      - "${LOCAL_PORT_BEDROCK:-19132}:19132/udp"  # Bedrock Edition
+
+    # Environment variables from .env file + additional environment variable
     env_file:
       - .env
+    environment:
+      TZ: Asia/Ho_Chi_Minh  # Set the timezone to Vietnam
+
+    # Optional: Volumes for persistent configuration and logs
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./stream.conf.d:/opt/nginx/stream.conf.d
+      - ./logs:/var/log/nginx

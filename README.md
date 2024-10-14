@@ -14,7 +14,14 @@ This image is available at [Docker Hub](https://hub.docker.com/r/vollborn/minecr
 ### Using docker run
 You can run it by using the following command:
 ```shell
-docker run -p 25565:25565 -e INITIAL_HOST=<host> -e INITIAL_PORT=<port> vollborn/minecraft-nginx-reverse-proxy
+docker run -d \
+  -p 25565:25565 \
+  -p 19132:19132/udp \
+  -e BEDROCK_HOST=192.168.1.1 \
+  -e BEDROCK_PORT=19132 \
+  -e JAVA_HOST=192.168.1.2 \
+  -e JAVA_PORT=25565 \
+  vollborn/minecraft-nginx-reverse-proxy
 ```
 
 ### Using docker compose
@@ -28,7 +35,8 @@ services:
     image: vollborn/minecraft-nginx-reverse-proxy
     restart: unless-stopped
     ports:
-      - "${LOCAL_PORT:-25565}:25565"
+      - "${LOCAL_PORT_JAVA:-25565}:25565"   # Java Edition
+      - "${LOCAL_PORT_BEDROCK:-19132}:19132/udp"  # Bedrock Edition
     environment:
       INITIAL_HOST: <host>
       INITIAL_PORT: <port>
@@ -40,11 +48,6 @@ Here we go.
 
 
 ## Development Setup
-Clone this project to your webserver.
-```
-git clone https://github.com/vollborn/minecraft-nginx-reverse-proxy.git
-```
-
 Enter the cloned directory.
 ```shell
 cd minecraft-nginx-reverse-proxy
@@ -81,8 +84,11 @@ bash ./sethost.sh <ip> <port>
 Examples:
 ```shell
 # Windows
-sethost 192.168.178.99 25565
+sethost bedrock 192.168.178.99 19132
+sethost java 192.168.178.99 25565
 
 # Linux
-bash ./sethost.sh 192.168.178.99 25565
+bash ./sethost.sh java 192.168.178.99 25565
+bash ./sethost.sh bedrock 192.168.178.99 19132
+
 ```
